@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 驼峰命名-->
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+    <!-- 配置别名 -->
+    <typeAliases>
+        <typeAlias type="com.civitasv.model.User" alias="User"/>
+        <typeAlias type="com.civitasv.model.Permission" alias="Permission"/>
+        <typeAlias type="com.civitasv.model.Role" alias="Role"/>
+        <typeAlias type="com.civitasv.model.RolePermission" alias="RolePermission"/>
+        <typeAlias type="com.civitasv.model.UserRole" alias="UserRole"/>
+    </typeAliases>
+    <!-- 配置mapper -->
+    <mappers>
+        <mapper class="com.civitasv.mapper.UserMapper"/>
+        <mapper class="com.civitasv.mapper.RolePermissionMapper"/>
+        <mapper class="com.civitasv.mapper.PermissionMapper"/>
+        <mapper class="com.civitasv.mapper.UserRoleMapper"/>
+        <mapper class="com.civitasv.mapper.RoleMapper"/>
+    </mappers>
+</configuration>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆页面</title>
+    <!-- bootstrap -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <!-- Icons -->
+    <link rel="stylesheet" th:href="@{/fontawesome/css/all.min.css}">
+    <!-- 自定义css -->
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+
+<main class="form-signin">
+    <form class="d-flex flex-column">
+        <img class="mb-4 align-self-center" th:src="@{/images/jwt_logo.svg}" alt="" width="72" height="57">
+        <h1 class="h3 mb-3 fw-normal text-center">请登录</h1>
+
+        <div class="form-floating">
+            <input type="text" class="form-control" id="username" placeholder="Username">
+            <label for="username">用户名</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="password" placeholder="Password">
+            <label for="password">密码</label>
+        </div>
+
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" value="remember-me"> 记住我
+            </label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" id="login">登录</button>
+        <p class="mt-5 mb-3 text-muted">&copy; Civitasv 2021</p>
+    </form>
+</main>
+<!-- jquery -->
+<script th:src="@{/scripts/jquery-3.2.1.js}"></script>
+<!-- bootstrap -->
+<script th:src="@{/scripts/bootstrap.bundle.js}"></script>
+<!-- 自定义js -->
+<script th:src="@{/scripts/base.js}"></script>
+<script th:src="@{/scripts/auth.js}"></script>
+<script th:src="@{/scripts/login.js}"></script>
+
+</body>
+</html>
