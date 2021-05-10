@@ -7,21 +7,21 @@
     <resultMap id="base" type="Permission">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
-        <result property="permission" column="permission"/>
+        <result property="description" column="description"/>
         <result property="url" column="url"/>
     </resultMap>
 
     <resultMap id="all" type="Permission">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
-        <result property="permission" column="permission"/>
+        <result property="description" column="description"/>
         <result property="url" column="url"/>
         <collection property="roles" column="id"
                     select="com.civitasv.mapper.RoleMapper.getRoleByPermissionId"/>
     </resultMap>
 
     <select id="getPermissionByRoleId" resultMap="base">
-        select id, name, permission, url
+        select id, name, description, url
         from permission p,
              role_permission rp
         where p.id = rp.permission_id

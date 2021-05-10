@@ -50,7 +50,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 }
                 token = token.substring(7);
                 // 获取 token 中的 username
-                String userId = tokenService.getUserIdFromToken(token);
+                String userId = tokenService.getUsernameFromToken(token);
                 if (userId == null)
                     throw new CustomException(ResultCode.AUTH_NEED, "请登录后执行该操作");
                 // 验证 token

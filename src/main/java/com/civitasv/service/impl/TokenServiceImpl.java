@@ -22,36 +22,36 @@ public class TokenServiceImpl implements TokenService {
 
     private static final String KEY = "3EK6FD+o0+c7tzBNVfjpMkNDi2yARAAKzQlk8O2IKoxQu4nF7EdAh8s3TwpHwrdWT6R";
 
-    @Override
-    public Map<String, Object> getAccessToken(User user) {
-        Date date = new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME);
-        // 将用户具有的权限存入claim
-        List<String> permissions = new ArrayList<>();
-        for (Role role : user.getRoles()) {
-            for (Permission permission : role.getPermissions()) {
-                permissions.add(permission.getUrl());
-            }
+@Override
+public Map<String, Object> getJWTToken(User user) {
+    Date date = new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME);
+    // 将用户具有的权限存入claim
+    List<String> permissions = new ArrayList<>();
+    for (Role role : user.getRoles()) {
+        for (Permission permission : role.getPermissions()) {
+            permissions.add(permission.getUrl());
         }
-        Key signKey = new SecretKeySpec(DatatypeConverter.parseBase64Binary(KEY), SignatureAlgorithm.HS256.getJcaName());
-        String accessToken = Jwts.builder()
-                .setSubject(user.getId())
-                .claim("permissions", permissions)
-                .setExpiration(date)
-                .signWith(signKey)
-                .compact();
-        Map<String, Object> map = new HashMap<>();
-        map.put("accessToken", accessToken);
-        map.put("accessTokenExpiry", date.getTime());
-        return map;
     }
+    Key signKey = new SecretKeySpec(DatatypeConverter.parseBase64Binary(KEY), SignatureAlgorithm.HS256.getJcaName());
+    String accessToken = Jwts.builder()
+            .setSubject(user.getUsername())
+            .claim("permissions", permissions)
+            .setExpiration(date)
+            .signWith(signKey)
+            .compact();
+    Map<String, Object> map = new HashMap<>();
+    map.put("jwtToken", accessToken);
+    map.put("jwtTokenExpiry", date.getTime());
+    return map;
+}
 
     @Override
-    public Map<String, Object> getRefreshToken(String userId) {
+    public Map<String, Object> getRefreshToken(String username) {
         Date date = new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRE_TIME);
         Map<String, Object> map = new HashMap<>();
         Key signKey = new SecretKeySpec(DatatypeConverter.parseBase64Binary(KEY), SignatureAlgorithm.HS256.getJcaName());
         String refreshToken = Jwts.builder()
-                .setSubject(userId)
+                .setSubject(username)
                 .setExpiration(date)
                 .signWith(signKey)
                 .compact();
@@ -64,18 +64,18 @@ public class TokenServiceImpl implements TokenService {
      * 从access token中获取用户ID
      */
     @Override
-    public String getUserIdFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         Claims claims = parseJWT(token);
         return claims.getSubject();
     }
 
     /**
-     * 从access token中获取用户权限
+     * 从jwtToken中获取用户权限
      */
 
     @Override
-    public List<String> getPermissions(String accessToken) {
-        Claims claims = parseJWT(accessToken);
+    public List<String> getPermissions(String jwtToken) {
+        Claims claims = parseJWT(jwtToken);
         return claims.get("permissions", List.class);
     }
 

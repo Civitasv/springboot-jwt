@@ -5,9 +5,9 @@ import com.civitasv.model.User;
 import java.util.List;
 
 public interface UserService {
-    User get(String userId, String password);
+    User get(String username, String password);
 
-    User getByUserId(String id);
+    User getByUserName(String username);
 
     int add(User user);
 
@@ -15,11 +15,9 @@ public interface UserService {
 
     int update(User user);
 
-    String getPwdByUserId(String id);
+    String getPwdByUserName(String username);
 
     List<User> getAll();
 
-    List<User> getUsersByName(String name);
-
-    List<User> getUsersByPhone(String phone);
+    List<User> getUsersByUserName(String name);
 }

@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface TokenService {
-    Map<String, Object> getAccessToken(User user);
+    Map<String, Object> getJWTToken(User user);
 
-    Map<String, Object> getRefreshToken(String userId);
+    Map<String, Object> getRefreshToken(String username);
 
-    String getUserIdFromToken(String accessToken);
+    String getUsernameFromToken(String accessToken);
 
     List<String> getPermissions(String accessToken);
 

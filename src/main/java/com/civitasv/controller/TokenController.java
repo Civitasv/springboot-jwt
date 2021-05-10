@@ -35,27 +35,25 @@ public class TokenController {
     public String refresh(@CookieValue(value = "refresh_token", defaultValue = "") String refreshToken, HttpServletResponse response) {
         // 验证 refresh token
         if (refreshToken.isEmpty()) {
-            return new Result<Map<String, Object>>().success(true).message("token不可以为空").code(ResultCode.AUTH_NEED).toString();
+            return new Result<Map<String, Object>>().success(false).message("token不可以为空").code(ResultCode.AUTH_NEED).toString();
         }
         if (tokenService.isExpire(refreshToken)) {
-            return new Result<Map<String, Object>>().success(true).message("刷新token已经失效").code(ResultCode.AUTH_NEED).toString();
+            return new Result<Map<String, Object>>().success(false).message("刷新token已经失效").code(ResultCode.AUTH_NEED).toString();
         }
-        // 获取userId
-        String userId = tokenService.getUserIdFromToken(refreshToken);
-        if (Objects.isNull(userId)) {
-            return new Result<Map<String, Object>>().success(true).message("刷新token已经失效").code(ResultCode.AUTH_NEED).toString();
+        // 获取username
+        String username = tokenService.getUsernameFromToken(refreshToken);
+        if (Objects.isNull(username)) {
+            return new Result<Map<String, Object>>().success(false).message("刷新token已经失效").code(ResultCode.AUTH_NEED).toString();
         }
         // 根据userId获取user
-        User user = userService.getByUserId(userId);
+        User user = userService.getByUserName(username);
         // 重新生成 access token 和 refresh token
-        Map<String, Object> accessTokenInfo = tokenService.getAccessToken(user); // 获得access token
+        Map<String, Object> accessTokenInfo = tokenService.getJWTToken(user); // 获得access token
         Map<String, Object> map = new HashMap<>();
-        map.put("access_token", accessTokenInfo.get("accessToken"));
-        map.put("access_token_expiry", accessTokenInfo.get("accessTokenExpiry"));
-        map.put("user_id", user.getId());
-        map.put("user_name", user.getName());
+        map.put("jwt_token", accessTokenInfo.get("jwtToken"));
+        map.put("jwt_token_expiry", accessTokenInfo.get("jwtTokenExpiry"));
 
-        Map<String, Object> refreshTokenInfo = tokenService.getRefreshToken(userId);
+        Map<String, Object> refreshTokenInfo = tokenService.getRefreshToken(username);
         // 将 refresh token 加入httponly cookie
         Cookie cookie = new Cookie("refresh_token", refreshTokenInfo.get("refreshToken").toString());
         cookie.setMaxAge(Integer.parseInt(refreshTokenInfo.get("refreshTokenMaxAge").toString()));

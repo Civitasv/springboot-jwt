@@ -7,9 +7,9 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    User get(String id, String password);
+    User get(String username, String password);
 
-    User getByUserId(String id);
+    User getByUserName(String username);
 
     int add(User user);
 
@@ -17,11 +17,9 @@ public interface UserMapper {
 
     int update(User user);
 
-    String getPwdByUserId(String id);
+    String getPwdByUserName(String username);
 
     List<User> getAll();
 
-    List<User> getUsersByName(String name);
-
-    List<User> getUsersByPhone(String phone);
+    List<User> getUsersByUserName(String username);
 }

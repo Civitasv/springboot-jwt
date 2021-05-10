@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByUserId(String id) {
-        return mapper.getByUserId(id);
+    public User getByUserName(String username) {
+        return mapper.getByUserName(username);
     }
 
     @Override
@@ -43,8 +43,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getPwdByUserId(String id) {
-        return mapper.getPwdByUserId(id);
+    public String getPwdByUserName(String username) {
+        return mapper.getPwdByUserName(username);
     }
 
     @Override
@@ -53,12 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsersByName(String name) {
-        return mapper.getUsersByName(name);
-    }
-
-    @Override
-    public List<User> getUsersByPhone(String phone) {
-        return mapper.getUsersByPhone(phone);
+    public List<User> getUsersByUserName(String username) {
+        return mapper.getUsersByUserName(username);
     }
 }

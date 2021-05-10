@@ -1,21 +1,17 @@
 // 鉴权
 let inMemoryToken; // 用于验证的token存入内存
 let interval; // 定时器
-function login({access_token, access_token_expiry}) {
+function login({jwt_token, jwt_token_expiry}) {
     inMemoryToken = {
-        token: access_token,
-        expiry: access_token_expiry
+        token: jwt_token,
+        expiry: jwt_token_expiry
     };
 }
 
 async function logout() {
-    if (localStorage.getItem("login_user"))
-        localStorage.removeItem("login_user");
-    if (localStorage.getItem("login_user_id"))
-        localStorage.removeItem("login_user_id");
     inMemoryToken = null; // 将token置空
     if (interval)
-        endCountdown(); // 停止倒计时
+        clearInterval(interval); // 停止计时事件
     localStorage.setItem("logout", Date.now());
     const url = `${base}/user/logout`
     try {
@@ -32,69 +28,75 @@ async function logout() {
     } catch (e) {
         console.log(e);
     }
+    location.href = `${base}/login`
 }
 
-async function auth(toLogin, toLogout) {
-    if (!inMemoryToken) {
-        const url = `${base}/token/refresh`;
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Cache-Control': 'no-cache'
+async function auth() {
+    const url = `${base}/token/refresh`;
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            }
+        })
+        if (response.ok) {
+            const res = await response.json();
+            if (res.code !== 200) {
+                if (inMemoryToken) {
+                    await logout();
                 }
-            })
-            if (response.ok) {
-                const res = await response.json();
-                if (res.code !== 200) {
-                    if (inMemoryToken) {
-                        console.log("需要重新登录");
-                        await logout();
-                        toLogout();
-                    }
-                    toLogin();
-                } else {
-                    const {access_token, access_token_expiry, user_id, user_name} = res.data;
-                    login({access_token, access_token_expiry});
-                    localStorage.setItem("login_user", user_name);
-                    localStorage.setItem("login_user_id", user_id);
-                }
+                // 登录
+                location.href = `${base}/login`;
             } else {
-                console.log(response.statusText)
+                const {jwt_token, jwt_token_expiry} = res.data;
+                login({jwt_token, jwt_token_expiry});
             }
-        } catch (e) {
-            console.log(e);
-            if (inMemoryToken) {
-                await logout();
-                toLogout();
-            }
-            toLogin();
+        } else {
+            console.log(response.statusText)
         }
+    } catch (e) {
+        console.log(e);
+        if (inMemoryToken) {
+            await logout();
+        }
+        // 登录
+        location.href = `${base}/login`;
     }
 }
 
-const addMinutes = function (dt, minutes) {
+function addMinutes(dt, minutes) {
     return new Date(dt.getTime() + minutes * 60000);
 }
 
-const startCountdown = function (toLogin, toLogout) {
+function startCountdown() {
     interval = setInterval(async () => {
         if (inMemoryToken) {
+            console.log(addMinutes(new Date(), 1))
+            console.log(new Date(inMemoryToken.expiry))
+            console.log(addMinutes(new Date(), 1) >= new Date(inMemoryToken.expiry))
+
             if (addMinutes(new Date(), 1) >= new Date(inMemoryToken.expiry)) {
-                await auth(toLogin, toLogout);
+                await auth();
             }
         } else {
-            await auth(toLogin, toLogout);
+            await auth();
         }
     }, 60000);
+    window.addEventListener("storage", syncLogout);
 }
 
-const onLogout = function (callback) {
-    window.addEventListener("storage", callback);
-}
-
-const endCountdown = function () {
-    clearInterval(interval);
+function syncLogout(event) {
+    if (event.key === 'logout') {
+        if (!inMemoryToken) {
+            return;
+        }
+        console.log('logged out from storage!')
+        inMemoryToken = null; // 将token置空
+        if (interval)
+            clearInterval(interval); // 停止倒计时
+        location.href = `${base}/login`;
+    }
 }

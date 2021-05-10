@@ -18,9 +18,9 @@ async function handleSubmit(username, password) {
                 alert("用户名或密码错误！")
                 return;
             }
-            const {access_token, access_token_expiry} = res.data;
-            login({access_token, access_token_expiry});
-            startCountdown(toLogin, toLogout);
+            const {jwt_token, jwt_token_expiry} = res.data;
+            login({jwt_token, jwt_token_expiry});
+            location.href = `${base}/`;
         } else {
             console.log(response.statusText)
         }
@@ -29,60 +29,15 @@ async function handleSubmit(username, password) {
     }
 }
 
-$('#login').click(async () => {
-    // 用户名
-    const username = $("#username").val();
-    const password = $("#password").val();
-    if (username === "" || password === "") {
-        alert("用户名和密码不能为空！");
-        return;
-    }
-    await handleSubmit(username, password);
-});
-
-async function syncLogout(event) {
-    if (event.key === 'logout') {
-        if (!inMemoryToken) {
+$(function () {
+    $('#login').click(async () => {
+        // 用户名
+        const username = $("#username").val();
+        const password = $("#password").val();
+        if (username === "" || password === "") {
+            alert("用户名和密码不能为空！");
             return;
         }
-        console.log('logged out from storage!')
-        $('#userLabel').empty().addClass('hidden');
-        $('#btnLogin').removeClass('hidden');
-        $('#btnLogout').addClass('hidden');
-        inMemoryToken = null; // 将token置空
-        if (interval)
-            endCountdown(); // 停止倒计时
-        $("#loginModal").modal('show');
-    }
-}
-
-function toLogin() {
-    location.href = `${base}/login`;
-}
-
-function toLogout() {
-    $('#userLabel').empty().addClass('hidden');
-    $('#btnLogin').removeClass('hidden');
-    $('#btnLogout').addClass('hidden');
-}
-
-$(function () {
-    $("#btnLogout").click(async () => {
-        $('#userLabel').empty().addClass('hidden');
-        $('#btnLogin').removeClass('hidden');
-        $('#btnLogout').addClass('hidden');
-        await logout();
+        await handleSubmit(username, password);
     });
-    onLogout(syncLogout);
-    auth(toLogin, toLogout).then(() => {
-        // 刷新是否成功
-        if (inMemoryToken) {
-            $("#userLabel").text(localStorage.getItem("login_user")).removeClass(
-                'hidden');
-            $("#btnLogin").addClass('hidden');
-            $('#btnLogout').removeClass(
-                'hidden');
-            startCountdown(toLogin, toLogout);
-        }
-    })
 });

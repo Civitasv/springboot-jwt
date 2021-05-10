@@ -34,19 +34,15 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(@RequestBody User requestUser, HttpServletResponse response) {
-        String username = requestUser.getId();
+        String username = requestUser.getUsername();
         String password = requestUser.getPassword();
-        // 密码加密
-        String encryptPwd = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
-        User user = userService.get(username, encryptPwd);
+        User user = userService.get(username, password);
         if (!Objects.isNull(user)) { // 验证成功，可登录
-            Map<String, Object> accessTokenInfo = tokenService.getAccessToken(user); // 获得access token
-            Map<String, Object> refreshTokenInfo = tokenService.getRefreshToken(user.getId()); // 获得refresh token
+            Map<String, Object> accessTokenInfo = tokenService.getJWTToken(user); // 获得access token
+            Map<String, Object> refreshTokenInfo = tokenService.getRefreshToken(user.getUsername()); // 获得refresh token
             Map<String, Object> map = new HashMap<>();
-            map.put("access_token", accessTokenInfo.get("accessToken"));
-            map.put("access_token_expiry", accessTokenInfo.get("accessTokenExpiry"));
-            map.put("user_id", user.getId());
-            map.put("user_name", user.getName());
+            map.put("jwt_token", accessTokenInfo.get("jwtToken"));
+            map.put("jwt_token_expiry", accessTokenInfo.get("jwtTokenExpiry"));
 
             // 将 refresh token 加入httponly cookie
             Cookie cookie = new Cookie("refresh_token", refreshTokenInfo.get("refreshToken").toString());
@@ -82,51 +78,5 @@ public class UserController {
             response.addCookie(cookie);
         }
         return new Result<Map<String, Object>>().success(true).message("退出成功").code(ResultCode.OK).toString();
-    }
-
-    @PostMapping("/repeat")
-    public String repeat(@RequestBody String userId) {
-        User user = userService.getByUserId(userId);
-        if (!Objects.isNull(user)) {
-            return new Result<String>().success(true).message("该用户名可用！").code(ResultCode.OK).toString();
-        } else {
-            return new Result<String>().success(false).message("该用户名已被注册！").code(ResultCode.CONFLICT).toString();
-        }
-    }
-
-    @VerifyToken(url = "/user/add")
-    @PostMapping("/add")
-    public String add(@RequestBody User user) {
-        // 密码加密
-        String encryptPwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes(StandardCharsets.UTF_8));
-        user.setPassword(encryptPwd);
-        int res = userService.add(user);
-        if (res != 0) {
-            return new Result<String>().success(true).message("成功添加用户！").code(ResultCode.CREATED).toString();
-        } else {
-            return new Result<String>().success(false).message("添加用户失败！").code(ResultCode.CONFLICT).toString();
-        }
-    }
-
-    @VerifyToken(url = "/user/delete")
-    @DeleteMapping("/delete")
-    public String delete(@RequestParam String id) {
-        int res = userService.delete(id);
-        if (res != 0) {
-            return new Result<String>().success(true).message("成功删除用户！").code(ResultCode.OK).toString();
-        } else {
-            return new Result<String>().success(false).message("删除用户失败！").code(ResultCode.NO_CONTENT).toString();
-        }
-    }
-
-    @VerifyToken(url = "/user/update")
-    @PutMapping("/update")
-    public String update(@RequestBody User user) {
-        int res = userService.update(user);
-        if (res != 0) {
-            return new Result<String>().success(true).message("成功更新用户！").code(ResultCode.OK).toString();
-        } else {
-            return new Result<String>().success(false).message("更新用户失败！").code(ResultCode.NO_CONTENT).toString();
-        }
     }
 }

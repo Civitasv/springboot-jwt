@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <!-- bootstrap -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <!-- Icons -->
+    <link rel="stylesheet" th:href="@{/fontawesome/css/all.min.css}">
+    <!-- 自定义css -->
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+<body>
+
+<div class="container-fluid vh-100" style="background-color: #98ddca">
+    <div class="d-flex justify-content-center align-items-center" style="height: 10vh;">
+        <span class="role" id="logout">Logout</span>
+    </div>
+    <div class="row" style="height: 90vh;">
+        <div class="col d-flex justify-content-center align-items-center" style="background-color: #e4fbff">
+            <span class="role" id="normal">Normal User</span>
+        </div>
+        <div class="col d-flex justify-content-center align-items-center" style="background-color: #ff7171">
+            <span class="role" id="admin">Administrator</span>
+        </div>
+    </div>
+</div>
+<!-- jquery -->
+<script th:src="@{/scripts/jquery-3.2.1.js}"></script>
+<!-- bootstrap -->
+<script th:src="@{/scripts/bootstrap.bundle.js}"></script>
+<!-- 自定义js -->
+<script th:src="@{/scripts/base.js}"></script>
+<script th:src="@{/scripts/auth.js}"></script>
+<script th:src="@{/scripts/index.js}"></script>
+</body>
+</html>
